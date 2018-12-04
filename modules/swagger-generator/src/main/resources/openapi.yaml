@@ -100,6 +100,24 @@ paths:
                 type: array
                 items:
                   type: string
+  "/documentation":
+    get:
+      tags:
+      - documentation
+      x-swagger-router-controller: io.swagger.v3.generator.online.GeneratorController
+      operationId: documentationLanguages
+      summary: List generator languages of type 'documentation'
+      parameters:
+      - "$ref": "#/components/parameters/version"
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
   "/generators/{type}":
     get:
       tags:

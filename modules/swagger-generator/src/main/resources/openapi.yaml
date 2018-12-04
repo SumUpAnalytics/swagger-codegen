@@ -12,12 +12,16 @@ info:
 tags:
 - name: clients
 - name: servers
+- name: documentation
+- name: config
 paths:
   "/generate":
     get:
       tags:
       - clients
       - servers
+      - documentation
+      - config
       x-swagger-router-controller: io.swagger.v3.generator.online.GeneratorController
       operationId: generateFromURL
       summary: Generates and download code. GenerationRequest input provided as JSON
@@ -40,6 +44,8 @@ paths:
       tags:
       - clients
       - servers
+      - documentation
+      - config
       x-swagger-router-controller: io.swagger.v3.generator.online.GeneratorController
       operationId: generate
       summary: Generates and download code. GenerationRequest input provided as request
@@ -61,9 +67,10 @@ paths:
     get:
       tags:
       - clients
+      - documentation
       x-swagger-router-controller: io.swagger.v3.generator.online.GeneratorController
       operationId: clientLanguages
-      summary: Gets languages supported by the client generator.
+      summary: List generator languages of type 'client' or 'documentation'
       parameters:
       - "$ref": "#/components/parameters/version"
       responses:
@@ -81,9 +88,53 @@ paths:
       - servers
       x-swagger-router-controller: io.swagger.v3.generator.online.GeneratorController
       operationId: serverLanguages
-      summary: Gets languages supported by the server generator.
+      summary: List generator languages of type 'server'
       parameters:
       - "$ref": "#/components/parameters/version"
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+  "/generators/{type}":
+    get:
+      tags:
+      - clients
+      - servers
+      - documentation
+      - config
+      x-swagger-router-controller: io.swagger.v3.generator.online.GeneratorController
+      operationId: languages
+      summary: List generator languages of the given type
+      parameters:
+      - "$ref": "#/components/parameters/version"
+      - "$ref": "#/components/parameters/type"
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+  "/generators":
+    get:
+      tags:
+      - clients
+      - servers
+      - documentation
+      - config
+      x-swagger-router-controller: io.swagger.v3.generator.online.GeneratorController
+      operationId: languages
+      summary: List generator languages of type included in parameter {types}
+      parameters:
+      - "$ref": "#/components/parameters/version"
+      - "$ref": "#/components/parameters/types"
       responses:
         '200':
           description: successful operation
@@ -98,9 +149,11 @@ paths:
       tags:
       - clients
       - servers
+      - documentation
+      - config
       x-swagger-router-controller: io.swagger.v3.generator.online.GeneratorController
       operationId: listOptions
-      summary: Returns options for a given language (client or server)
+      summary: Returns options for a given language
       parameters:
       - name: language
         in: query
@@ -128,6 +181,30 @@ components:
         enum:
         - V2
         - V3
+    type:
+      name: type
+      in: path
+      description: generator type
+      schema:
+        type: string
+        enum:
+        - client
+        - server
+        - documentation
+        - config
+    types:
+      name: types
+      in: query
+      description: comma-separated list of generator types
+      schema:
+        type: array
+          items:
+            type: string
+            enum:
+            - client
+            - server
+            - documentation
+            - config
   schemas:
     GenerationRequest:
       x-swagger-router-model: io.swagger.codegen.v3.service.GenerationRequest
@@ -137,7 +214,7 @@ components:
         lang:
           type: string
           title: language
-          description: client language to generate (required)
+          description: language to generate (required)
           example: java
         spec:
           type: object
@@ -147,10 +224,12 @@ components:
           description: URL of the spec in json format. Alternative to `spec`
         type:
           type: string
-          description: type of the spec (client or server)
+          description: type of the spec
           enum:
           - CLIENT
           - SERVER
+          - DOCUMENTATION
+          - CONFIG
         codegenVersion:
           type: string
           description: codegen version to use

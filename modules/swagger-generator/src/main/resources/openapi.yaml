@@ -63,62 +63,7 @@ paths:
               schema:
                 type: string
                 format: binary
-  "/clients":
-    get:
-      tags:
-      - clients
-      - documentation
-      x-swagger-router-controller: io.swagger.v3.generator.online.GeneratorController
-      operationId: clientLanguages
-      summary: List generator languages of type 'client' or 'documentation'
-      parameters:
-      - "$ref": "#/components/parameters/version"
-      responses:
-        '200':
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
-  "/servers":
-    get:
-      tags:
-      - servers
-      x-swagger-router-controller: io.swagger.v3.generator.online.GeneratorController
-      operationId: serverLanguages
-      summary: List generator languages of type 'server'
-      parameters:
-      - "$ref": "#/components/parameters/version"
-      responses:
-        '200':
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
-  "/documentation":
-    get:
-      tags:
-      - documentation
-      x-swagger-router-controller: io.swagger.v3.generator.online.GeneratorController
-      operationId: documentationLanguages
-      summary: List generator languages of type 'documentation'
-      parameters:
-      - "$ref": "#/components/parameters/version"
-      responses:
-        '200':
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
-  "/generators/{type}":
+  "/{type}/{version}":
     get:
       tags:
       - clients
@@ -127,10 +72,18 @@ paths:
       - config
       x-swagger-router-controller: io.swagger.v3.generator.online.GeneratorController
       operationId: languages
-      summary: List generator languages of the given type
+      summary: List generator languages of the given type and version
       parameters:
-      - "$ref": "#/components/parameters/version"
       - "$ref": "#/components/parameters/type"
+      - version:
+          name: version
+          in: path
+          description: generator version used by codegen engine
+          schema:
+            type: string
+            enum:
+            - V2
+            - V3
       responses:
         '200':
           description: successful operation
@@ -140,7 +93,7 @@ paths:
                 type: array
                 items:
                   type: string
-  "/generators":
+  "/types":
     get:
       tags:
       - clients
@@ -149,10 +102,10 @@ paths:
       - config
       x-swagger-router-controller: io.swagger.v3.generator.online.GeneratorController
       operationId: languages
-      summary: List generator languages of type included in parameter {types}
+      summary: List generator languages of version defined in 'version parameter (defaults to V3) and type included in 'types' parameter; all languages
       parameters:
-      - "$ref": "#/components/parameters/version"
       - "$ref": "#/components/parameters/types"
+      - "$ref": "#/components/parameters/version"
       responses:
         '200':
           description: successful operation
@@ -171,7 +124,7 @@ paths:
       - config
       x-swagger-router-controller: io.swagger.v3.generator.online.GeneratorController
       operationId: listOptions
-      summary: Returns options for a given language
+      summary: Returns options for a given language and version (defaults to V3)
       parameters:
       - name: language
         in: query

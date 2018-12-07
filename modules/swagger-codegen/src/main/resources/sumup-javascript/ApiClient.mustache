@@ -492,48 +492,17 @@
 {{^usePromises}}    request.end(function(error, response) {
       if (callback) {
         var data = null;
-        var polling = false;
         if (!error) {
           try {
             data = _this.deserialize(response, returnType);
             if (_this.enableCookies && typeof window === 'undefined'){
               _this.agent.saveCookies(response);
             }
-            if (data.job_id) {
-                polling = true;
-                console.log("Starting polling....", data.job_id);
-
-                var cb = function(e,d,r) {
-                    if (e) {
-                        // An error occurred
-                        callback(e,d,r);
-                    }
-                    else if (d) {
-                        console.log("got polled response.")
-                        var res = JSON.parse(d.result)
-                        var progress = JSON.parse(d.progress)
-                        if (d.error) {
-                            callback(JSON.parse(d.error), d, r)
-                        }
-                        else if (res != null) {
-                            callback(e, res, r);
-                        } else {
-                            console.log("no result yet... restart polling");
-                            setTimeout(function () {
-                                _this.api.getJob(data.job_id, cb);
-                            }, 1000);
-                        }
-                    }
-                }
-                console.log("First polling (called only once)");
-                _this.api.getJob(data.job_id, cb);
-
-            }
           } catch (err) {
             error = err;
           }
         }
-        if (!polling) callback(error, data, response);
+        callback(error, data, response);
       }
     });
 
